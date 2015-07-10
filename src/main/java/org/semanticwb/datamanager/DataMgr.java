@@ -96,17 +96,22 @@ public class DataMgr
     {
         System.out.println("loadLocalScript:"+source);  
         InputStream r=DataMgr.class.getResourceAsStream(source);
-        System.out.println("r:"+r);
+        //System.out.println("r:"+r);
         if(r!=null)
         {
             engine.eval(new InputStreamReader(r,"UTF8"));                                
         } 
         return engine;
-    }    
+    }   
     
     public static SWBScriptEngine getScriptEngine(String source)
     {
-        SWBBaseScriptEngine engine=SWBBaseScriptEngine.getScriptEngine(source);
+        return getScriptEngine(source, true);
+    }   
+    
+    public static SWBScriptEngine getScriptEngine(String source, boolean internal)
+    {
+        SWBBaseScriptEngine engine=SWBBaseScriptEngine.getScriptEngine(source,internal);
         return engine;
     }
     

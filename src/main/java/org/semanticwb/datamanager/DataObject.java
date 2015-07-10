@@ -7,6 +7,7 @@
 package org.semanticwb.datamanager;
 
 import java.util.HashMap;
+import org.semanticwb.datamanager.datastore.DataStoreMongo;
 
 /**
  *
@@ -61,5 +62,10 @@ public class DataObject extends HashMap<String, Object>
             e.printStackTrace();
         }
         return false;
-    }       
+    }      
+    
+    public static Object parseJSON(String json)
+    {
+        return DataStoreMongo.parseJSON(json);
+    }
 }

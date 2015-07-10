@@ -47,15 +47,22 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     private static final List _emptyList_=new ArrayList();
     
     private boolean closed=false;
-    
+    private boolean internalSource=false;
+
     private SWBBaseScriptEngine(String source)
     {
+        
+    }    
+    
+    private SWBBaseScriptEngine(String source, boolean internalSource)
+    {
         this.source=source;
+        this.internalSource=internalSource;
     }
     
     private void init()
     {
-        System.out.println("initializing BigData Engine...");
+        System.out.println("initializing DataManager Engine...");
         try
         {
             file=new File(DataMgr.getApplicationPath()+source);
@@ -66,7 +73,10 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
             //engine.put("_swbf_sengine", this);
             
             engine=DataMgr.loadLocalScript("/global.js", engine);
-            engine=DataMgr.loadScript(source, engine);            
+            if(internalSource)
+                engine=DataMgr.loadLocalScript(source, engine); 
+            else
+                engine=DataMgr.loadScript(source, engine);            
             
             ScriptObject eng=new ScriptObject(engine.get("eng"));
               
@@ -459,7 +469,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     
 //******************************** static *****************************************************//    
     
-    protected static SWBBaseScriptEngine getScriptEngine(String source)
+    protected static SWBBaseScriptEngine getScriptEngine(String source, boolean internal)
     {
         SWBBaseScriptEngine engine=engines.get(source);        
         if(engine==null)
@@ -471,7 +481,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
                 {
                     try
                     {
-                        engine=new SWBBaseScriptEngine(source);
+                        engine=new SWBBaseScriptEngine(source,internal);
                         engine.init();
                         engines.put(source, engine);
                     }catch(Throwable e)
@@ -497,7 +507,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
                 {
                     closed=true;
                     dataExtractorsStop();
-                    System.out.println("Closed BigData Engine...");
+                    System.out.println("Closed DataManager Engine...");
                 }
             }
         }

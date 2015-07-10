@@ -11,6 +11,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.util.JSON;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -336,7 +337,7 @@ public class DataStoreMongo implements SWBDataStore
         return ret;
     }
     
-    private Object toData(Object obj)
+    private static Object toData(Object obj)
     {
         if(obj instanceof BasicDBObject)
         {
@@ -348,7 +349,7 @@ public class DataStoreMongo implements SWBDataStore
         return obj;  
     }    
     
-    private DataList toDataList(BasicDBList obj)
+    private static DataList toDataList(BasicDBList obj)
     {
         DataList ret=new DataList();
         Iterator it=obj.iterator();
@@ -358,7 +359,7 @@ public class DataStoreMongo implements SWBDataStore
         return ret;
     }    
 
-    private DataObject toDataObject(BasicDBObject obj)
+    private static DataObject toDataObject(BasicDBObject obj)
     {
         DataObject ret=new DataObject();
         Iterator<Map.Entry<String,Object>> it=obj.entrySet().iterator();
@@ -368,4 +369,9 @@ public class DataStoreMongo implements SWBDataStore
         }
         return ret;
     }    
+    
+    public static Object parseJSON(String json)
+    {
+        return toData(JSON.parse(json));
+    }
 }
