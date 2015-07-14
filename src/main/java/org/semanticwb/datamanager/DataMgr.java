@@ -104,11 +104,23 @@ public class DataMgr
         return engine;
     }   
     
+    /**
+     * Regresa ScriptEngine asociado al archivo js de datasources relativo al classpath
+     * @param source ruta del archivo js de datasources relativo al classpath
+     * @return SWBScriptEngine
+     */
     public static SWBScriptEngine getScriptEngine(String source)
     {
         return getScriptEngine(source, true);
     }   
     
+    
+    /**
+     * Regresa ScriptEngine asociado al archivo js de datasources 
+     * @param source ruta del archivo js de datasources
+     * @param internal, si es true la ruta es relativa al classpath, de lo contrario es relativa al workpath
+     * @return SWBScriptEngine
+     */
     public static SWBScriptEngine getScriptEngine(String source, boolean internal)
     {
         SWBBaseScriptEngine engine=SWBBaseScriptEngine.getScriptEngine(source,internal);
