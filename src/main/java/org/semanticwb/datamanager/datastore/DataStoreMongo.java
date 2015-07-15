@@ -15,6 +15,8 @@ import com.mongodb.util.JSON;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Logger;
+
 import org.bson.types.ObjectId;
 import org.semanticwb.datamanager.DataList;
 import org.semanticwb.datamanager.DataObject;
@@ -27,12 +29,14 @@ import org.semanticwb.datamanager.script.ScriptObject;
  */
 public class DataStoreMongo implements SWBDataStore
 {
+    //static private Logger log = Logger.getLogger(DataStoreMongo.class.getName());
     private MongoClient mongoClient=null;
     ScriptObject dataStore=null;
         
     public DataStoreMongo(ScriptObject dataStore) 
     {
         //System.out.println("DataStoreMongo:"+dataStore);
+        //log.info("Creating a Mongo DataStore");
         this.dataStore=dataStore;
         try
         {
@@ -52,7 +56,18 @@ public class DataStoreMongo implements SWBDataStore
                 if(mongoClient==null)
                 {
                     //TODO:configurar direccion de servidor
-                    mongoClient = new MongoClient(dataStore.getString("host"),(Integer)dataStore.get("port").getValue());
+                    if ((null!=this.dataStore.getString("envhost") && null!=this.dataStore.getString("envport")))
+                    {
+                        String host = System.getenv(dataStore.getString("envhost"));
+                        //log.info("Host:"+host);
+                        int port = Integer.parseInt(System.getenv(dataStore.getString("envport")));
+                        //log.info("Port:"+port);
+                        System.out.println("host:port -> "+host+":"+port);
+                        mongoClient = new MongoClient(host, port);
+                    } else
+                    {
+                        mongoClient = new MongoClient(dataStore.getString("host"), (Integer) dataStore.get("port").getValue());
+                    }
                 }                
             }
         }
