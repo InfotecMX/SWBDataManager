@@ -29,14 +29,13 @@ import org.semanticwb.datamanager.script.ScriptObject;
  */
 public class DataStoreMongo implements SWBDataStore
 {
-    //static private Logger log = Logger.getLogger(DataStoreMongo.class.getName());
+    static private Logger log = Logger.getLogger(DataStoreMongo.class.getName());
     private MongoClient mongoClient=null;
     ScriptObject dataStore=null;
         
     public DataStoreMongo(ScriptObject dataStore) 
     {
         //System.out.println("DataStoreMongo:"+dataStore);
-        //log.info("Creating a Mongo DataStore");
         this.dataStore=dataStore;
         try
         {
@@ -62,7 +61,7 @@ public class DataStoreMongo implements SWBDataStore
                         //log.info("Host:"+host);
                         int port = Integer.parseInt(System.getenv(dataStore.getString("envport")));
                         //log.info("Port:"+port);
-                        System.out.println("host:port -> "+host+":"+port);
+                        log.fine("Connecting to: host:port -> "+host+":"+port);
                         mongoClient = new MongoClient(host, port);
                     } else
                     {
@@ -139,7 +138,7 @@ public class DataStoreMongo implements SWBDataStore
             }
 
             //System.out.println("find:"+scls+" "+data);
-
+            log.fine("find: "+scls+" "+data);
             DBCursor cur = coll.find(data);
             int total=cur.count();
 
@@ -191,6 +190,7 @@ public class DataStoreMongo implements SWBDataStore
     public DataObject add(DataObject dson, SWBDataSource dataSource) throws IOException
     {
         BasicDBObject json=toBasicDBObject(dson);
+        log.finest("Adding: "+json.toString());
 //        MongoClient mongoClient = new MongoClient("localhost");
         try
         {        
