@@ -39,6 +39,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     private HashMap<String,List<SWBDataProcessor>> dataProcessors=null;
     
     private ScriptEngine sengine=null;
+    private ScriptObject sobject=null;
     private String source=null;    
     private File file=null;    
     private transient long updated;
@@ -79,6 +80,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
                 engine=DataMgr.loadScript(source, engine);            
             
             ScriptObject eng=new ScriptObject(engine.get("eng"));
+            sobject=eng;
               
             //Load DataStores
             {
@@ -247,6 +249,11 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     public ScriptObject getDataSourceScript(String name)
     {
         return dataSources.get(name);
+    }
+    
+    public ScriptObject getScriptObject()
+    {
+        return sobject;
     }
     
     @Override
