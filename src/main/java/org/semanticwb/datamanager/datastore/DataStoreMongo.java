@@ -207,8 +207,8 @@ public class DataStoreMongo implements SWBDataStore
             if(obj.getString("_id")==null)
             {
                 ObjectId id = new ObjectId();
-                obj.append("_id", "_suri:"+modelid+":"+scls+":"+id.toString());
-                //obj.append("_id", id);
+                //obj.append("_id", "_suri:"+modelid+":"+scls+":"+id.toString());
+                obj.append("_id", id);
             }
             coll.insert(obj);
 

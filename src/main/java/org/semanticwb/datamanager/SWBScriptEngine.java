@@ -59,6 +59,8 @@ public interface SWBScriptEngine
     
     public Bindings getUserBindings();
     
+    public DataObject getUser();
+    
     public String encodeSHA(String str);
     
     public void close();

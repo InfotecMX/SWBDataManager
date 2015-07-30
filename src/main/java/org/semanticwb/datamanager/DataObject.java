@@ -16,6 +16,20 @@ import org.semanticwb.datamanager.datastore.DataStoreMongo;
  */
 public class DataObject extends HashMap<String, Object>
 {
+    public DataObject getDataObject(String key)
+    {
+        Object obj=get(key);
+        if(obj instanceof DataObject)return (DataObject)obj;  
+        return null;
+    }
+    
+    public DataList getDataList(String key)
+    {
+        Object obj=get(key);
+        if(obj instanceof DataList)return (DataList)obj;  
+        return null;
+    }    
+    
     public String getString(String key)
     {
         Object obj=get(key);

@@ -288,7 +288,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     @Override
     public void invokeDataServices(String dataSource, String action, DataObject request, DataObject response)
     {
-        invokeDataServices(null, dataSource, action, request, response);
+        invokeDataServices(this, dataSource, action, request, response);
     }
        
     protected void invokeDataServices(SWBScriptEngine userengine, String dataSource, String action, DataObject request, DataObject response)
@@ -337,7 +337,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     @Override
     public DataObject invokeDataProcessors(String dataSource, String action, String method, DataObject obj)
     {
-        return invokeDataProcessors(null, dataSource, action, method, obj);
+        return invokeDataProcessors(this, dataSource, action, method, obj);
     }
     
     
@@ -435,7 +435,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     }
     
    
-    public Bindings getUserBindings(SWBScriptEngine engine)
+    public Bindings getUserBindings(SWBUserScriptEngine engine)
     {
         Bindings b=null;
 //        if(user==null)return null;
@@ -474,6 +474,32 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
         return DataUtils.encodeSHA(str);
     }
     
+    @Override
+    public void close() {
+        if(!closed)
+        {
+            synchronized(this)
+            {
+                if(!closed)
+                {
+                    closed=true;
+                    dataExtractorsStop();
+                    System.out.println("Closed DataManager Engine...");
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean isClosed() {
+        return closed;
+    }
+
+    @Override
+    public DataObject getUser() {
+        return null;
+    }    
+    
 //******************************** static *****************************************************//    
     
     protected static SWBBaseScriptEngine getScriptEngine(String source, boolean internal)
@@ -502,27 +528,6 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
             engine.chechUpdates();
         }
         return engine;
-    }
-
-    @Override
-    public void close() {
-        if(!closed)
-        {
-            synchronized(this)
-            {
-                if(!closed)
-                {
-                    closed=true;
-                    dataExtractorsStop();
-                    System.out.println("Closed DataManager Engine...");
-                }
-            }
-        }
-    }
-
-    @Override
-    public boolean isClosed() {
-        return closed;
     }
     
 }

@@ -18,7 +18,7 @@ public class DataMgrTest {
         ScriptEngine engine = DataMgr.getNativeScriptEngine();
         int suma = (Integer)engine.eval("{1+2}");
         assertEquals(suma,3);
-        SWBScriptEngine swbEngine = DataMgr.getScriptEngine("/demo.js");
+        SWBScriptEngine swbEngine = DataMgr.getUserScriptEngine("/demo.js",null);
 
     }
 }
