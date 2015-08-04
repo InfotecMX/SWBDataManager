@@ -106,6 +106,17 @@ public class DataObject extends HashMap<String, Object>
                 return sb.append('}').toString();
             sb.append(',').append(' ');
         }
-    }    
+    }  
+    
+    public String getId()
+    {
+        return getString("_id");
+    }
+    
+    public String getNumId()
+    {
+        String id=getId();
+        return id.substring(id.lastIndexOf(":")+1);
+    }
     
 }

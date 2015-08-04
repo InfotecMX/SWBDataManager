@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author javiersolis
  */
-public class DataList extends ArrayList<Object>
+public class DataList<E> extends ArrayList<E>
 {
     public String getString(int index) {
         Object obj=get(index);
