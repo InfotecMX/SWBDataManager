@@ -101,6 +101,11 @@ public class SWBDataSource
         ret=update(req);
         return ret;
     }
+
+    public DataObject fetchObjByNumId(String id) throws IOException
+    {
+        return fetchObjById(getBaseUri()+id);
+    }    
     
     public DataObject fetchObjById(String id) throws IOException
     {
@@ -289,6 +294,13 @@ public class SWBDataSource
             ret=DataUtils.getArrayNode(fields, "name", name);
         }
         return ret;
+    }
+    
+    public String getBaseUri()
+    {
+        String modelid=getDataSourceScript().getString("modelid");
+        String scls=getDataSourceScript().getString("scls");
+        return "_suri:"+modelid+":"+scls+":";
     }
             
 //******************************************* static *******************************/            

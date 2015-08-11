@@ -28,6 +28,13 @@ public class DataObject extends HashMap<String, Object>
         Object obj=get(key);
         if(obj instanceof DataList)return (DataList)obj;  
         return null;
+    }   
+    
+    public String getString(String key, String def)
+    {
+        String ret=getString(key);
+        if(ret!=null)return ret;
+        return def;
     }    
     
     public String getString(String key)
