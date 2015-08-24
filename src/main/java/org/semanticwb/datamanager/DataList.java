@@ -20,7 +20,21 @@ public class DataList<E> extends ArrayList<E>
         return obj.toString();
     }
     
-public int getInt(int index)
+    public DataObject getDataObject(int index)
+    {
+        Object obj=get(index);
+        if(obj instanceof DataObject)return (DataObject)obj;
+        return null;
+    }
+    
+    public DataList getDataList(int index)
+    {
+        Object obj=get(index);
+        if(obj instanceof DataList)return (DataList)obj;
+        return null;
+    }    
+    
+    public int getInt(int index)
     {
         Object obj=get(index);
         if(obj instanceof Integer)return (Integer)obj;
