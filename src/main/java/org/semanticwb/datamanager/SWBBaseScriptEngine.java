@@ -74,10 +74,17 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
             //engine.put("_swbf_sengine", this);
             
             engine=DataMgr.loadLocalScript("/global.js", engine);
+            
+            String baseDS=DataMgr.getBaseInstance().getBaseDatasource();
+            if(baseDS!=null)
+            {
+                engine=DataMgr.loadScript(baseDS, engine);
+            }            
+            
             if(internalSource)
                 engine=DataMgr.loadLocalScript(source, engine); 
             else
-                engine=DataMgr.loadScript(source, engine);            
+                engine=DataMgr.loadScript(source, engine);  
             
             ScriptObject eng=new ScriptObject(engine.get("eng"));
             sobject=eng;

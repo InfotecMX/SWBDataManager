@@ -27,6 +27,8 @@ public class DataMgr
     
     private static String applicationPath=null;
     
+    private String baseDatasource=null;
+    
     private DataMgr(String applicationPath)
     {
         System.out.println("Initializing DataMgr:"+applicationPath);        
@@ -38,6 +40,20 @@ public class DataMgr
         
         //DataSource.init(applicationPath+"WEB-INF/datasources/");        
     }
+    
+    public void setBaseDatasourse(String baseDatasource)
+    {
+        this.baseDatasource=baseDatasource;
+    }
+
+    public String getBaseDatasource() {
+        return baseDatasource;
+    }
+    
+    public static DataMgr getBaseInstance()
+    {
+        return instance;
+    }    
     
     public static DataMgr createInstance(String applicationPath)
     {
