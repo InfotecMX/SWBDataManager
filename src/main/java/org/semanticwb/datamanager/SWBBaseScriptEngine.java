@@ -19,6 +19,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import org.semanticwb.datamanager.datastore.SWBDataStore;
+import org.semanticwb.datamanager.filestore.SWBFileSource;
 import org.semanticwb.datamanager.script.ScriptObject;
 
 /**
@@ -32,6 +33,8 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
 //    private final HashMap<SWBUser, Bindings> users=new HashMap();    
     private HashMap<String,ScriptObject> dataSources=null;
     private HashMap<String,SWBDataStore> dataStores=null;
+    
+    private HashMap<String, SWBFileSource> fileSources=null;
     
     private HashMap<String,DataExtractorBase> dataExtractors=null;
         
@@ -76,7 +79,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
             engine=DataMgr.loadLocalScript("/global.js", engine);
             
             String baseDS=DataMgr.getBaseInstance().getBaseDatasource();
-            if(baseDS!=null && !baseDS.equals(source))
+            if(baseDS!=null)
             {
                 engine=DataMgr.loadScript(baseDS, engine);
             }            
@@ -219,7 +222,31 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
 //                ScriptObject ur=eng.get("userRepository");   
 //                System.out.println("Loading UserRepository");
 //                userRep=new SWBUserRepository(ur, this);
-//            }      
+//            } 
+            {
+                this.fileSources = new HashMap<>();
+                ScriptObject dss=eng.get("fileSources");
+                Iterator<String> it=dss.keySet().iterator();
+                while (it.hasNext()) {
+                    String dsname = it.next();
+                    ScriptObject fileSource=dss.get(dsname); 
+                    String fileSourceClass=fileSource.getString("class");
+                    String dataStore=fileSource.getString("dataStore");
+                    ScriptObject ds = eng.get("dataStores");
+                    if (null!=ds){
+                        ds = ds.get(dataStore);
+                    } else {
+                        ds = null;
+                    }
+                    try
+                    {
+                        Class cls=Class.forName(fileSourceClass);
+                        Constructor c=cls.getConstructor(ScriptObject.class, ScriptObject.class);
+                        System.out.println("Loading FileSource:"+dsname); 
+                        fileSources.put(dsname,(SWBFileSource)c.newInstance(fileSource, ds));
+                    }catch(Exception e){e.printStackTrace();}        
+                }
+            }
             
             dataExtractorsStart();         
             
@@ -535,6 +562,11 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
             engine.chechUpdates();
         }
         return engine;
+    }
+
+    @Override
+    public SWBFileSource getFileSource(String name) {
+        return fileSources.get(name);
     }
     
 }

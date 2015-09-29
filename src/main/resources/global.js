@@ -8,6 +8,7 @@ var eng = {
     dataServices:{},                    //Servicios
     dataProcessors:{},                  //DataProcessors
     dataExtractors:{},                  //DataExtractors
+    fileSources: {},
 };
 
 

@@ -12,6 +12,7 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import org.semanticwb.datamanager.datastore.SWBDataStore;
+import org.semanticwb.datamanager.filestore.SWBFileSource;
 import org.semanticwb.datamanager.script.ScriptObject;
 
 /**
@@ -46,6 +47,8 @@ public interface SWBScriptEngine
     public SWBDataSource getDataSource(String name);
 
     public SWBDataStore getDataStore(String name);
+    
+    public SWBFileSource getFileSource(String name);
 
     public ScriptEngine getNativeScriptEngine();
     

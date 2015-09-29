@@ -12,6 +12,7 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import org.semanticwb.datamanager.datastore.SWBDataStore;
+import org.semanticwb.datamanager.filestore.SWBFileSource;
 import org.semanticwb.datamanager.script.ScriptObject;
 
 /**
@@ -123,5 +124,10 @@ public class SWBUserScriptEngine implements SWBScriptEngine
     @Override
     public boolean isClosed() {
         return engine.isClosed();
+    }
+
+    @Override
+    public SWBFileSource getFileSource(String name) {
+        return engine.getFileSource(name);
     }
 }
