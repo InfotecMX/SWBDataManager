@@ -91,6 +91,10 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
             
             ScriptObject eng=new ScriptObject(engine.get("eng"));
             sobject=eng;
+            
+            //Load Routes
+            ScriptObject ros = eng.get("routes");
+            RoutesMgr.parseRouter(ros);
               
             //Load DataStores
             {

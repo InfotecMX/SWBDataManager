@@ -38,7 +38,8 @@ public class DataMgr
         
         DataMgr.applicationPath=applicationPath;
         
-        //DataSource.init(applicationPath+"WEB-INF/datasources/");        
+        //DataSource.init(applicationPath+"WEB-INF/datasources/");   
+        RoutesMgr.startup();
     }
     
     public void setBaseDatasourse(String baseDatasource)
