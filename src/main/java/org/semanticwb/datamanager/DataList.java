@@ -7,6 +7,7 @@
 package org.semanticwb.datamanager;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  *
@@ -75,5 +76,25 @@ public class DataList<E> extends ArrayList<E>
         }
         return false;
     }          
+    
+    public String toString() 
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        Iterator it=iterator();
+        while (it.hasNext()) {
+            Object object = it.next();
+            if(object instanceof String)
+            {
+                sb.append("\""+object+"\"");
+            }else
+            {
+                sb.append(object);
+            }
+            if(it.hasNext())sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
+    }     
     
 }
