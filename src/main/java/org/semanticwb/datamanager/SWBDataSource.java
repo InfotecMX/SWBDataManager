@@ -5,6 +5,7 @@
 package org.semanticwb.datamanager;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import org.semanticwb.datamanager.datastore.SWBDataStore;
@@ -29,6 +30,8 @@ public class SWBDataSource
     private SWBScriptEngine engine=null;
     private ScriptObject script=null;
     private SWBDataStore db=null;
+    
+    private HashMap<String,DataObject> cache=new HashMap();
 
     protected SWBDataSource(String name, ScriptObject script, SWBScriptEngine engine)
     {
@@ -131,6 +134,45 @@ public class SWBDataSource
         return ret;
     }
     
+    /**
+     * Regresa Objecto de cache NumID y si no lo tiene lo carga, de lo contrario regresa null
+     * @param id
+     * @return 
+     */
+    public DataObject getObjectByNumId(String id)
+    {
+        return getObjectById(getBaseUri()+id);
+    }    
+    
+    /**
+     * Regresa Objecto de cache por ID y si no lo tiene lo carga, de lo contrario regresa null
+     * @param id
+     * @return 
+     */
+    public DataObject getObjectById(String id)
+    {
+        DataObject obj=cache.get(id);
+        if(obj==null)
+        {
+            synchronized(cache)
+            {
+                obj=cache.get(id);
+                if(obj==null)
+                {
+                    try
+                    {
+                        obj=fetchObjById(id);
+                        cache.put(id, obj);
+                    }catch(IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return obj;
+    }
+    
     public DataObject removeObjById(String id) throws IOException
     {
         DataObject ret=null;
@@ -144,6 +186,9 @@ public class SWBDataSource
         {
             ret=(DataObject)r.get("response");       
         }
+        
+        cache.remove(id);
+        
         return ret;
     }   
     
@@ -158,6 +203,17 @@ public class SWBDataSource
         DataObject res=db.update(req,this);
         res=engine.invokeDataProcessors(name, SWBDataSource.ACTION_UPDATE, SWBDataProcessor.METHOD_RESPONSE, res);
         engine.invokeDataServices(name, SWBDataSource.ACTION_UPDATE, req, res);
+        
+        if(req!=null)
+        {
+            DataObject data=req.getDataObject("data");
+            if(data!=null)
+            {
+                String id=data.getString("_id");
+                cache.remove(id);
+            }
+        }
+        
         return res;
     }    
     
@@ -186,6 +242,7 @@ public class SWBDataSource
         DataObject res=db.remove(req,this);
         res=engine.invokeDataProcessors(name, SWBDataSource.ACTION_REMOVE, SWBDataProcessor.METHOD_RESPONSE, res);
         engine.invokeDataServices(name, SWBDataSource.ACTION_REMOVE, req, res);
+        cache.clear();        
         return res;
     }    
     

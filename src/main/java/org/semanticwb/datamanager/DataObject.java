@@ -126,4 +126,24 @@ public class DataObject extends HashMap<String, Object>
         return id.substring(id.lastIndexOf(":")+1);
     }
     
+    public DataObject addParam(String key, Object value)
+    {
+        put(key, value);
+        return this;
+    }
+    
+    public DataObject addSubObject(String key)
+    {
+        DataObject data=new DataObject();
+        put(key, data);
+        return data;
+    }
+    
+    public DataList addSubList(String key)
+    {
+        DataList data=new DataList();
+        put(key, data);
+        return data;
+    }    
+    
 }

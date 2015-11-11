@@ -238,11 +238,20 @@ public class DataStoreMongo implements SWBDataStore
             DBCollection coll = db.getCollection(scls);
 
             BasicDBObject data = (BasicDBObject)json.get("data");
+            
+            boolean removeByID=json.getBoolean("removeByID",true);
 
+            DBObject base=null;
             //ObjectId id=getObjectId(data);
-            String id=data.getString("_id");
-            BasicDBObject search=new BasicDBObject().append("_id", id);
-            DBObject base=coll.findAndRemove(search);
+            if(removeByID)
+            {
+                String id=data.getString("_id");
+                BasicDBObject search=new BasicDBObject().append("_id", id);
+                base=coll.findAndRemove(search);
+            }else
+            {
+                coll.remove(data);                
+            }
 
             BasicDBObject ret=new BasicDBObject();
             BasicDBObject resp=new BasicDBObject();
