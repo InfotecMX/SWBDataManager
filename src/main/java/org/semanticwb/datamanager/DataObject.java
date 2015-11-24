@@ -126,6 +126,40 @@ public class DataObject extends HashMap<String, Object>
         return id.substring(id.lastIndexOf(":")+1);
     }
     
+    public String getModelId()
+    {
+        String id=getId();
+        int i1=id.indexOf(":");
+        if(i1>-1)
+        {
+            int i2=id.indexOf(":",i1+1);
+            if(i2>-1)
+            {
+                return id.substring(i1+1,i2);
+            }
+        }
+        return null;
+    }
+    
+    public String getClassName()
+    {
+        String id=getId();
+        int i1=id.indexOf(":");
+        if(i1>-1)
+        {
+            int i2=id.indexOf(":",i1+1);
+            if(i2>-1)
+            {
+                int i3=id.indexOf(":",i2+1);
+                if(i3>-1)
+                {
+                    return id.substring(i2+1,i3);
+                }
+            }
+        }
+        return null;
+    }
+    
     public DataObject addParam(String key, Object value)
     {
         put(key, value);
