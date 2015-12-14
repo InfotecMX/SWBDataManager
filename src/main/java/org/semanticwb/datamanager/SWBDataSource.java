@@ -27,6 +27,7 @@ public class SWBDataSource
     public static final String ACTION_USER="user";
     
     private String name=null;
+    private String dataStoreName=null;
     private SWBScriptEngine engine=null;
     private ScriptObject script=null;
     private SWBDataStore db=null;
@@ -38,7 +39,7 @@ public class SWBDataSource
         this.name=name;
         this.engine=engine;
         this.script=script;        
-        String dataStoreName=this.script.getString("dataStore");
+        dataStoreName=this.script.getString("dataStore");
         this.db=engine.getDataStore(dataStoreName);        
         if(this.db==null)throw new NoSuchFieldError("DataStore not found:"+dataStoreName);
     }
@@ -357,7 +358,9 @@ public class SWBDataSource
     {
         String modelid=getDataSourceScript().getString("modelid");
         String scls=getDataSourceScript().getString("scls");
+        //TODO:get NS
         return "_suri:"+modelid+":"+scls+":";
+        //return "_suri:http://swb.org/"+dataStoreName+"/"+modelid+"/"+scls+":";
     }
             
 //******************************************* static *******************************/            

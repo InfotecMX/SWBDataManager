@@ -16,6 +16,28 @@ import org.semanticwb.datamanager.datastore.DataStoreMongo;
  */
 public class DataObject extends HashMap<String, Object>
 {
+    private Object toData(Object value)
+    {
+        if(value instanceof jdk.nashorn.internal.objects.NativeArray)
+        {
+            System.out.print(value);
+            jdk.nashorn.internal.objects.NativeArray narr=(jdk.nashorn.internal.objects.NativeArray)value;
+            Object arr[]=narr.asObjectArray();
+            DataList list=new DataList();
+            for(int x=0;x<arr.length;x++)
+            {
+                list.add(toData(arr[x]));
+            }
+            return list;
+        }return value;        
+    }
+
+    @Override
+    public Object put(String key, Object value) {
+        return super.put(key, toData(value)); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
     public DataObject getDataObject(String key)
     {
         Object obj=get(key);
@@ -44,6 +66,12 @@ public class DataObject extends HashMap<String, Object>
         return obj.toString();
     }
     
+    public int getInt(String key, int def)
+    {
+        if(get(key)==null)return def;
+        return getInt(key);
+    }     
+    
     public int getInt(String key)
     {
         Object obj=get(key);
@@ -58,6 +86,12 @@ public class DataObject extends HashMap<String, Object>
         return 0;
     }
     
+    public long getLong(String key, long def)
+    {
+        if(get(key)==null)return def;
+        return getLong(key);
+    }       
+    
     public long getLong(String key)
     {
         Object obj=get(key);
@@ -71,6 +105,12 @@ public class DataObject extends HashMap<String, Object>
         }
         return 0;
     }   
+    
+    public boolean getBoolean(String key, boolean def)
+    {
+        if(get(key)==null)return def;
+        return getBoolean(key);
+    }       
     
     public boolean getBoolean(String key)
     {
@@ -106,9 +146,14 @@ public class DataObject extends HashMap<String, Object>
             sb.append("\""+key+"\"");
             sb.append(':');
             if(value instanceof String)
+            {
+                value=((String)value).replace("\"", "\\\"");
                 sb.append(value == this ? "(this Map)" : "\""+value+"\"");
+            }
             else
+            {
                 sb.append(value == this ? "(this Map)" : value);
+            }
             if (! i.hasNext())
                 return sb.append('}').toString();
             sb.append(',').append(' ');
