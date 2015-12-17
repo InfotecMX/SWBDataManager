@@ -100,9 +100,20 @@ public class DataUtils {
         return str;
     }
     
-    private static Object toData(Object obj)
+    public static Object toData(Object obj)
     {
-        if(obj instanceof ScriptObjectMirror && ((ScriptObjectMirror)obj).isArray())
+        if(obj instanceof jdk.nashorn.internal.objects.NativeArray)
+        {
+            //System.out.print(value);
+            jdk.nashorn.internal.objects.NativeArray narr=(jdk.nashorn.internal.objects.NativeArray)obj;
+            Object arr[]=narr.asObjectArray();
+            DataList list=new DataList();
+            for(int x=0;x<arr.length;x++)
+            {
+                list.add(toData(arr[x]));
+            }
+            return list;
+        }else if(obj instanceof ScriptObjectMirror && ((ScriptObjectMirror)obj).isArray())
         {
             return toDataList((ScriptObjectMirror)obj);
         }else if(obj instanceof ScriptObjectMirror)

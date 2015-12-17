@@ -16,27 +16,10 @@ import org.semanticwb.datamanager.datastore.DataStoreMongo;
  */
 public class DataObject extends HashMap<String, Object>
 {
-    private Object toData(Object value)
-    {
-        if(value instanceof jdk.nashorn.internal.objects.NativeArray)
-        {
-            System.out.print(value);
-            jdk.nashorn.internal.objects.NativeArray narr=(jdk.nashorn.internal.objects.NativeArray)value;
-            Object arr[]=narr.asObjectArray();
-            DataList list=new DataList();
-            for(int x=0;x<arr.length;x++)
-            {
-                list.add(toData(arr[x]));
-            }
-            return list;
-        }return value;        
-    }
-
     @Override
     public Object put(String key, Object value) {
-        return super.put(key, toData(value)); //To change body of generated methods, choose Tools | Templates.
+        return super.put(key, DataUtils.toData(value)); //To change body of generated methods, choose Tools | Templates.
     }
-    
     
     public DataObject getDataObject(String key)
     {
