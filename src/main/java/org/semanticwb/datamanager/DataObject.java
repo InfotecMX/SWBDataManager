@@ -131,6 +131,7 @@ public class DataObject extends HashMap<String, Object>
             if(value instanceof String)
             {
                 value=((String)value).replace("\"", "\\\"");
+                value=((String)value).replace("\n", "\\n");
                 sb.append(value == this ? "(this Map)" : "\""+value+"\"");
             }
             else
