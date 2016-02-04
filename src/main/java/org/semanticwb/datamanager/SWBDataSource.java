@@ -87,6 +87,11 @@ public class SWBDataSource
         engine.invokeDataServices(name, SWBDataSource.ACTION_FETCH, req, res);
         return res;
     }
+    
+    public DataObject fetch(jdk.nashorn.api.scripting.ScriptObjectMirror json) throws IOException
+    {        
+        return fetch(DataUtils.toDataObject(json));
+    }
 
     public DataObject addObj(DataObject obj) throws IOException
     {
@@ -95,7 +100,12 @@ public class SWBDataSource
         req.put("data", obj);        
         ret=add(req);
         return ret;
-    }    
+    }  
+    
+    public DataObject addObj(jdk.nashorn.api.scripting.ScriptObjectMirror json) throws IOException
+    {        
+        return addObj(DataUtils.toDataObject(json));
+    }
     
     public DataObject updateObj(DataObject obj) throws IOException
     {
@@ -104,6 +114,11 @@ public class SWBDataSource
         req.put("data", obj);        
         ret=update(req);
         return ret;
+    }
+    
+    public DataObject updateObj(jdk.nashorn.api.scripting.ScriptObjectMirror json) throws IOException
+    {        
+        return updateObj(DataUtils.toDataObject(json));
     }
 
     public DataObject fetchObjByNumId(String id) throws IOException
@@ -216,7 +231,12 @@ public class SWBDataSource
         }
         
         return res;
-    }    
+    }   
+    
+    public DataObject update(jdk.nashorn.api.scripting.ScriptObjectMirror json) throws IOException
+    {        
+        return update(DataUtils.toDataObject(json));
+    }
     
 //    public DataObject add(String query) throws IOException
 //    {
@@ -230,7 +250,12 @@ public class SWBDataSource
         res=engine.invokeDataProcessors(name, SWBDataSource.ACTION_ADD, SWBDataProcessor.METHOD_RESPONSE, res);
         engine.invokeDataServices(name, SWBDataSource.ACTION_ADD, req, res);
         return res;
-    }    
+    }  
+    
+    public DataObject add(jdk.nashorn.api.scripting.ScriptObjectMirror json) throws IOException
+    {        
+        return add(DataUtils.toDataObject(json));
+    }
     
 //    public DataObject remove(String query) throws IOException
 //    {
@@ -245,7 +270,12 @@ public class SWBDataSource
         engine.invokeDataServices(name, SWBDataSource.ACTION_REMOVE, req, res);
         cache.clear();        
         return res;
-    }    
+    }   
+    
+    public DataObject remove(jdk.nashorn.api.scripting.ScriptObjectMirror json) throws IOException
+    {        
+        return remove(DataUtils.toDataObject(json));
+    }
     
 //    public DataObject validate(String query) throws IOException
 //    {
@@ -341,6 +371,11 @@ public class SWBDataSource
         }
         return ret;                
     } 
+    
+    public DataObject validate(jdk.nashorn.api.scripting.ScriptObjectMirror json) throws IOException
+    {        
+        return validate(DataUtils.toDataObject(json));
+    }
     
     public ScriptObject getDataSourceScriptField(String name)
     {
