@@ -106,11 +106,10 @@ public class SWBUserScriptEngine implements SWBScriptEngine
     }
     
     @Override
-    public String encodeSHA(String str)
-    {
-        return engine.encodeSHA(str);
-    }    
-
+    public SWBScriptUtils getUtils() {
+        return engine.getUtils();
+    } 
+    
     @Override
     public ScriptObject getScriptObject() {
         return engine.getScriptObject();

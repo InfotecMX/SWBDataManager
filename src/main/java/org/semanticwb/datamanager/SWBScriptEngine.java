@@ -64,7 +64,7 @@ public interface SWBScriptEngine
     
     public DataObject getUser();
     
-    public String encodeSHA(String str);
+    public SWBScriptUtils getUtils();
     
     public void close();
     

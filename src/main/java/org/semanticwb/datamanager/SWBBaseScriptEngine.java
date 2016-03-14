@@ -52,10 +52,11 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     
     private boolean closed=false;
     private boolean internalSource=false;
+    
+    private SWBScriptUtils utils;
 
     private SWBBaseScriptEngine(String source)
-    {
-        
+    {        
     }    
     
     private SWBBaseScriptEngine(String source, boolean internalSource)
@@ -69,6 +70,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
         System.out.println("initializing DataManager Engine...");
         try
         {
+            utils=new SWBScriptUtils(this);
             file=new File(DataMgr.getApplicationPath()+source);
             updated=file.lastModified();
             lastCheck=System.currentTimeMillis();        
@@ -506,10 +508,10 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     public Bindings getUserBindings() {
         return null;
     }   
-    
-    public String encodeSHA(String str)
-    {
-        return DataUtils.encodeSHA(str);
+
+    @Override
+    public SWBScriptUtils getUtils() {
+        return utils;
     }
     
     @Override
