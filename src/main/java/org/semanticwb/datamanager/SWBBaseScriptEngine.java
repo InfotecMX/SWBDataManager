@@ -153,7 +153,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
                         dataExtractors.put(key,dext);
                     }catch(Exception e){e.printStackTrace();} 
                 }
-            }                   
+            }     
             
             //Load DataServices
             {
@@ -173,17 +173,38 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
                     {
                         ScriptObject dsname = dsit.next();
                         Iterator<ScriptObject> acit=data.get("actions").values().iterator();
-                        while (acit.hasNext()) {
-                            ScriptObject action = acit.next();
-                            String k=dsname.getValue()+"-"+action.getValue();
-                            List<SWBDataService> arr=dataServices.get(k);
-                            if(arr==null)
+                        while (acit.hasNext()) 
+                        {
+                            String action = acit.next().getValue().toString();
+                            String name=dsname.getValue().toString();
+                            
+                            if(name.equals("*"))
                             {
-                                arr=new ArrayList();
-                                dataServices.put(k, arr);
+                                Iterator<String> itds=dataSources.keySet().iterator();
+                                while (itds.hasNext()) 
+                                {
+                                    name = itds.next();
+                                    String k=name+"-"+action;
+                                    List<SWBDataService> arr=dataServices.get(k);
+                                    if(arr==null)
+                                    {
+                                        arr=new ArrayList();
+                                        dataServices.put(k, arr);
+                                    }
+                                    arr.add(dataService);
+                                }
+                                
+                            }else
+                            {
+                                String k=name+"-"+action;
+                                List<SWBDataService> arr=dataServices.get(k);
+                                if(arr==null)
+                                {
+                                    arr=new ArrayList();
+                                    dataServices.put(k, arr);
+                                }
+                                arr.add(dataService);
                             }
-                            arr.add(dataService);
-                            //System.out.println(k+":"+dataService);
                         }
                     }
                 }
@@ -207,21 +228,43 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
                     {
                         ScriptObject dsname = dsit.next();
                         Iterator<ScriptObject> acit=data.get("actions").values().iterator();
-                        while (acit.hasNext()) {
-                            ScriptObject action = acit.next();
-                            String k=dsname.getValue()+"-"+action.getValue();
-                            List<SWBDataProcessor> arr=dataProcessors.get(k);
-                            if(arr==null)
+                        while (acit.hasNext()) 
+                        {
+                            String action = acit.next().getValue().toString();
+                            String name=dsname.getValue().toString();
+                            
+                            if(name.equals("*"))
                             {
-                                arr=new ArrayList();
-                                dataProcessors.put(k, arr);
-                            }
-                            arr.add(dataProcessor);
-                            //System.out.println(k+":"+dataProcessor);
+                                Iterator<String> itds=dataSources.keySet().iterator();
+                                while (itds.hasNext()) 
+                                {
+                                    name = itds.next();
+                                    String k=name+"-"+action;
+                                    List<SWBDataProcessor> arr=dataProcessors.get(k);
+                                    if(arr==null)
+                                    {
+                                        arr=new ArrayList();
+                                        dataProcessors.put(k, arr);
+                                    }
+                                    arr.add(dataProcessor);
+                                }
+                                
+                            }else
+                            {
+                                String k=name+"-"+action;
+                                List<SWBDataProcessor> arr=dataProcessors.get(k);
+                                if(arr==null)
+                                {
+                                    arr=new ArrayList();
+                                    dataProcessors.put(k, arr);
+                                }
+                                arr.add(dataProcessor);
+                            }                            
+
                         }
                     }
                 }
-            }    
+            }                                       
             
 //            //Load UserRepository
 //            {
