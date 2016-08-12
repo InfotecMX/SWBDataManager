@@ -8,6 +8,7 @@ package org.semanticwb.datamanager;
 
 import java.io.Reader;
 import java.util.List;
+import java.util.Set;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -128,5 +129,10 @@ public class SWBUserScriptEngine implements SWBScriptEngine
     @Override
     public SWBFileSource getFileSource(String name) {
         return engine.getFileSource(name);
+    }
+
+    @Override
+    public Set<String> getDataSourceNames() {
+        return engine.getDataSourceNames();
     }
 }

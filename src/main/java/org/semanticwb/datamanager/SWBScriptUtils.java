@@ -62,11 +62,11 @@ public class SWBScriptUtils
                 String user=smail.getString("user");
                 String passwd=smail.getString("passwd");
                 int port=(Integer)smail.get("port").getValue();
-                int sslPort=0;
-                if(smail.get("sslPort")!=null)
-                {
-                    sslPort=(Integer)smail.get("sslPort").getValue();
-                }
+                //int sslPort=0;
+                //if(smail.get("sslPort")!=null)
+                //{
+                //    sslPort=(Integer)smail.get("sslPort").getValue();
+                //}
                 boolean ssl=(Boolean)smail.get("ssl").getValue();
 
                 try {
@@ -78,7 +78,7 @@ public class SWBScriptUtils
 
                     MultiPartEmail.getMethod("setAuthenticator", Class.forName("javax.mail.Authenticator")).invoke(mail, auth);            
                     MultiPartEmail.getMethod("setSmtpPort", Integer.TYPE).invoke(mail, port);
-                    if(sslPort>0)MultiPartEmail.getMethod("setSslSmtpPort", Integer.TYPE).invoke(mail, sslPort);
+                    //if(sslPort>0)MultiPartEmail.getMethod("setSslSmtpPort", Integer.TYPE).invoke(mail, sslPort);
                     
                     MultiPartEmail.getMethod("setSSLOnConnect", Boolean.TYPE).invoke(mail, ssl);
                     MultiPartEmail.getMethod("setHostName", String.class).invoke(mail, host);

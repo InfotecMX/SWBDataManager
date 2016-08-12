@@ -8,6 +8,7 @@ package org.semanticwb.datamanager;
 
 import java.io.Reader;
 import java.util.List;
+import java.util.Set;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -45,6 +46,8 @@ public interface SWBScriptEngine
     public List<SWBDataService> findDataServices(String dataSource, String action);
 
     public SWBDataSource getDataSource(String name);
+    
+    public Set<String> getDataSourceNames();
 
     public SWBDataStore getDataStore(String name);
     

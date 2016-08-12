@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.script.Bindings;
 import javax.script.ScriptContext;
@@ -337,6 +338,11 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     public ScriptObject getScriptObject()
     {
         return sobject;
+    }
+    
+    public Set<String> getDataSourceNames()
+    {
+        return dataSources.keySet();   
     }
     
     @Override
