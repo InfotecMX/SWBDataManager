@@ -120,6 +120,21 @@ public class SWBDataSource
     {        
         return updateObj(DataUtils.toDataObject(json));
     }
+    
+    public DataObject removeObj(DataObject obj) throws IOException
+    {
+        DataObject ret=null;
+        DataObject req=new DataObject();
+        req.put("data", obj);        
+        ret=remove(req);
+        return ret;
+    }
+    
+    public DataObject removeObj(jdk.nashorn.api.scripting.ScriptObjectMirror json) throws IOException
+    {        
+        return removeObj(DataUtils.toDataObject(json));
+    }    
+    
 
     public DataObject fetchObjByNumId(String id) throws IOException
     {
@@ -188,6 +203,11 @@ public class SWBDataSource
         }
         return obj;
     }
+    
+    public DataObject removeObjByNumId(String id) throws IOException
+    {
+        return removeObjById(getBaseUri()+id);
+    }    
     
     public DataObject removeObjById(String id) throws IOException
     {

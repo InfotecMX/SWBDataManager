@@ -42,6 +42,16 @@ public class DataMgr
         RoutesMgr.startup();
     }
     
+    public static SWBScriptEngine initPlatform(String path, javax.servlet.http.HttpSession session)
+    {
+        DataObject user=null;
+        if(session!=null)
+        {
+            user = (DataObject) session.getAttribute("_USER_");
+        }
+        return DataMgr.getUserScriptEngine(path, user, false);          
+    }
+    
     public void setBaseDatasourse(String baseDatasource)
     {
         this.baseDatasource=baseDatasource;
