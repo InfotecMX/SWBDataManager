@@ -18,6 +18,7 @@ import org.semanticwb.datamanager.script.ScriptObject;
 public class SWBDataSource 
 {
     public static final String ACTION_FETCH="fetch";
+    public static final String ACTION_AGGREGATE="aggregate";
     public static final String ACTION_UPDATE="update";
     public static final String ACTION_ADD="add";
     public static final String ACTION_REMOVE="remove";
@@ -92,6 +93,20 @@ public class SWBDataSource
     {        
         return fetch(DataUtils.toDataObject(json));
     }
+    
+    public DataObject aggregate(DataObject json) throws IOException
+    {
+        DataObject req=engine.invokeDataProcessors(name, SWBDataSource.ACTION_AGGREGATE, SWBDataProcessor.METHOD_REQUEST, json);
+        DataObject res=db.aggregate(req,this);
+        res=engine.invokeDataProcessors(name, SWBDataSource.ACTION_AGGREGATE, SWBDataProcessor.METHOD_RESPONSE, res);
+        engine.invokeDataServices(name, SWBDataSource.ACTION_AGGREGATE, req, res);
+        return res;
+    }
+    
+    public DataObject aggregate(jdk.nashorn.api.scripting.ScriptObjectMirror json) throws IOException
+    {        
+        return aggregate(DataUtils.toDataObject(json));
+    }    
 
     public DataObject addObj(DataObject obj) throws IOException
     {

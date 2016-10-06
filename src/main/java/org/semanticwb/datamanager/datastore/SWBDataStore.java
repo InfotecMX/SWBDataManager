@@ -17,6 +17,8 @@ public interface SWBDataStore
 {
     public DataObject fetch(DataObject json, SWBDataSource dataSource) throws IOException;
 
+    public DataObject aggregate(DataObject json, SWBDataSource dataSource) throws IOException;
+    
     public DataObject add(DataObject json, SWBDataSource dataSource) throws IOException;
 
     public DataObject remove(DataObject json, SWBDataSource dataSource) throws IOException;

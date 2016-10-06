@@ -4,6 +4,7 @@
  */
 package org.semanticwb.datamanager.datastore;
 
+import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -14,6 +15,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -186,6 +188,69 @@ public class DataStoreMongo implements SWBDataStore
 //            mongoClient.close();
         }
     }    
+    
+    public DataObject aggregate(DataObject dson, SWBDataSource dataSource) throws IOException
+    {
+        BasicDBObject json=toBasicDBObject(dson);
+        
+//        MongoClient mongoClient = new MongoClient("localhost");
+        try
+        {
+            ScriptObject dss=dataSource.getDataSourceScript();        
+            String modelid=dss.getString("modelid");
+            String scls=dss.getString("scls");
+            DB db = mongoClient.getDB(modelid);
+            DBCollection coll = db.getCollection(scls);
+
+            int startRow = json.getInt("startRow",0);
+            int endRow = json.getInt("endRow",0);
+            
+            List data=null;
+            Object d=json.get("data");
+            if(d instanceof BasicDBList)
+            {
+                data=(BasicDBList)d;
+            }else if(d instanceof BasicDBObject)
+            {
+                data=new BasicDBList();
+                data.add(d);
+            }            
+
+            BasicDBObject ret=new BasicDBObject();
+            BasicDBObject resp=new BasicDBObject();
+            BasicDBList ndata=new BasicDBList();
+            ret.append("response", resp);
+            resp.append("status", 0);
+            resp.append("startRow", startRow);
+            resp.append("data", ndata);
+
+            //System.out.println("find:"+scls+" "+data);
+            log.fine("agregate: "+scls+" "+data);
+            AggregationOutput aggrout = coll.aggregate(data);
+            
+            int total=0;
+            
+            Iterator<DBObject> it= aggrout.results().iterator();
+            while(it.hasNext())
+            {
+                DBObject obj=it.next();
+                if(total>=startRow)
+                {
+                    ndata.add(obj);
+                }
+                total++;
+                if(total==endRow)break;                
+            }            
+
+            resp.append("endRow", endRow);
+            resp.append("totalRows", total);   
+            //System.out.println("fetach:"+ret);
+            return toDataObject(ret);        
+        }finally
+        {
+//            mongoClient.close();
+        }
+    }        
     
     public DataObject add(DataObject dson, SWBDataSource dataSource) throws IOException
     {
