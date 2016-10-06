@@ -58,6 +58,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
 
     private SWBBaseScriptEngine(String source)
     {        
+        this.source=source;
     }    
     
     private SWBBaseScriptEngine(String source, boolean internalSource)
@@ -72,9 +73,15 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
         try
         {
             utils=new SWBScriptUtils(this);
-            file=new File(DataMgr.getApplicationPath()+source);
-            updated=file.lastModified();
             lastCheck=System.currentTimeMillis();        
+            if(!source.equals("[GLOBAL]"))
+            {
+                file=new File(DataMgr.getApplicationPath()+source);
+                updated=file.lastModified();
+            }else
+            {
+                updated=System.currentTimeMillis();;
+            }
             
             ScriptEngine engine=DataMgr.getNativeScriptEngine();     
             //engine.put("_swbf_sengine", this);
@@ -87,10 +94,13 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
                 engine=DataMgr.loadScript(baseDS, engine);
             }            
             
-            if(internalSource)
-                engine=DataMgr.loadLocalScript(source, engine); 
-            else
-                engine=DataMgr.loadScript(source, engine);  
+            if(!source.equals("[GLOBAL]"))
+            {
+                if(internalSource)
+                    engine=DataMgr.loadLocalScript(source, engine); 
+                else
+                    engine=DataMgr.loadScript(source, engine);  
+            }
             
             ScriptObject eng=new ScriptObject(engine.get("eng"));
             sobject=eng;

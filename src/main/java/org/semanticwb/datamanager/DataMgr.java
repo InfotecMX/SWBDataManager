@@ -42,6 +42,16 @@ public class DataMgr
         RoutesMgr.startup();
     }
     
+    public static SWBScriptEngine initPlatform(javax.servlet.http.HttpSession session)
+    {
+        DataObject user=null;
+        if(session!=null)
+        {
+            user = (DataObject) session.getAttribute("_USER_");
+        }
+        return DataMgr.getUserScriptEngine("[GLOBAL]", user, false);          
+    }    
+    
     public static SWBScriptEngine initPlatform(String path, javax.servlet.http.HttpSession session)
     {
         DataObject user=null;
