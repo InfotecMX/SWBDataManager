@@ -460,6 +460,9 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
                         {
                             obj=(DataObject)r.getValue();
                         }
+                    }catch(jdk.nashorn.internal.runtime.ECMAException ecma)
+                    {
+                        throw ecma;
                     }catch(Throwable e)
                     {
                         e.printStackTrace();
@@ -519,7 +522,7 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
         {
             lastCheck=time;
             //System.out.println("time:"+(time-lastCheck)+" updated:"+updated+" source.lastModified():"+source.lastModified());
-            if(updated!=file.lastModified())
+            if(file!=null && updated!=file.lastModified())
             {
                 synchronized(this)
                 {

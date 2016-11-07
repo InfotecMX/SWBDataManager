@@ -33,7 +33,9 @@ public class SWBDataSource
     private ScriptObject script=null;
     private SWBDataStore db=null;
     
-    private HashMap<String,DataObject> cache=new HashMap();
+    private HashMap<String,DataObject> cache=new HashMap();    
+    private HashMap<String,String> removeDependenceFields=null;
+    
 
     protected SWBDataSource(String name, ScriptObject script, SWBScriptEngine engine)
     {
@@ -297,9 +299,121 @@ public class SWBDataSource
 //        return remove((DataObject)JSON.parse(query));
 //    }
     
+    public HashMap getRemoveDependenceFields()
+    {
+        if(removeDependenceFields==null)
+        {
+            synchronized(this)
+            {
+                if(removeDependenceFields==null)
+                {
+                    System.out.println("Loading removeDependence "+getName());
+                    removeDependenceFields=new HashMap();
+                    ScriptObject fields=script.get("fields");
+                    if(fields!=null)
+                    {
+                        Iterator<ScriptObject> it = fields.values().iterator();
+                        while (it.hasNext()) {
+                            ScriptObject obj = it.next();
+                            String val = obj.getString("removeDependence");
+                            if(val==null && "grid".equals(obj.getString("stype")))val="true"; //TODO: crear deficionion configurable de stipos contra propiedades
+                            if(val!=null && val.equals("true"))
+                            {
+                                String name=obj.getString("name");
+                                String dss=obj.getString("dataSource");
+                                removeDependenceFields.put(name,dss);
+                            }
+                        }   
+                    }
+                    ScriptObject links=script.get("links");
+                    if(links!=null)
+                    {
+                        Iterator<ScriptObject>it = links.values().iterator();
+                        while (it.hasNext()) {
+                            ScriptObject obj = it.next();
+                            String val = obj.getString("removeDependence");
+                            if(val==null || val.equals("true"))
+                            {
+                                String name=obj.getString("name");
+                                String dss=obj.getString("dataSource");
+                                removeDependenceFields.put(name,dss);
+                            }
+                        }     
+                    }
+                }
+            }            
+        }
+        return removeDependenceFields;
+    }
+    
+    private void removeDependence(String id) throws IOException
+    {
+        //System.out.println("removeDependence:"+id);
+        if(id==null)return;
+        DataObject obj=fetchObjById(id);
+        //System.out.println("obj:"+obj);
+        HashMap map=getRemoveDependenceFields();
+        Iterator<String> it=map.keySet().iterator();
+        while (it.hasNext()) {
+            String name = it.next();
+            String dss=(String)map.get(name);
+            Object o=obj.get(name);
+            //System.out.println("prop:"+name+":"+o);
+            if(o instanceof DataList)
+            {
+                DataList list=(DataList)o;
+                Iterator<String> it2=list.iterator();
+                while (it2.hasNext()) {
+                    String str = it2.next();
+                    //System.out.println("remove m:"+str+":"+dss);
+                    SWBDataSource ds=engine.getDataSource(dss);
+                    ds.removeObjById(str);
+                }
+            }else if(o instanceof String)
+            {
+                //System.out.println("remove s:"+o+":"+dss);
+                SWBDataSource ds=engine.getDataSource(dss);
+                ds.removeObjById(o.toString());
+            }
+            
+        }
+    }
+    
+    private void checkRemoveDependence(DataObject json) throws IOException
+    {        
+        HashMap map=getRemoveDependenceFields();
+        if(!map.isEmpty())
+        {
+            DataObject data = json.getDataObject("data");
+            boolean removeByID=json.getBoolean("removeByID",true);
+            if(removeByID)
+            {
+                String id=data.getString("_id");
+                removeDependence(id);
+            }else
+            {
+                DataObject r=fetch(json);
+                if(r!=null)
+                {
+                    DataObject res=(DataObject)r.get("response");       
+                    if(res!=null)
+                    {
+                        DataList rdata=(DataList)res.get("data");
+                        Iterator<DataObject> it=rdata.iterator();
+                        while (it.hasNext()) {
+                            DataObject obj = it.next();
+                            removeDependence(obj.getId());
+                        }
+                    }   
+                }
+            }
+        }
+    }
+    
     public DataObject remove(DataObject json) throws IOException
     {
         DataObject req=engine.invokeDataProcessors(name, SWBDataSource.ACTION_REMOVE, SWBDataProcessor.METHOD_REQUEST, json);
+        checkRemoveDependence(json);
         DataObject res=db.remove(req,this);
         res=engine.invokeDataProcessors(name, SWBDataSource.ACTION_REMOVE, SWBDataProcessor.METHOD_RESPONSE, res);
         engine.invokeDataServices(name, SWBDataSource.ACTION_REMOVE, req, res);
