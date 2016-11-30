@@ -361,10 +361,21 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
         ScriptObject so=getDataSourceScript(name);
         if(so!=null)
         {
-            return new SWBDataSource(name,so,this);
+            return new SWBDataSource(name,null,so,this);
         }
         return null;
     }
+    
+    @Override
+    public SWBDataSource getDataSource(String name, String modelid)
+    {
+        ScriptObject so=getDataSourceScript(name);
+        if(so!=null)
+        {
+            return new SWBDataSource(name,modelid,so,this);
+        }
+        return null;
+    }    
     
     @Override
     public SWBDataStore getDataStore(String name)
@@ -635,6 +646,16 @@ public class SWBBaseScriptEngine implements SWBScriptEngine
     @Override
     public SWBFileSource getFileSource(String name) {
         return fileSources.get(name);
+    }
+
+    @Override
+    public Object getContextData(String key) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object setContextData(String key, Object data) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

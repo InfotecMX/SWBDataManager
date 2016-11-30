@@ -47,6 +47,8 @@ public interface SWBScriptEngine
 
     public SWBDataSource getDataSource(String name);
     
+    public SWBDataSource getDataSource(String name, String modelid);    
+    
     public Set<String> getDataSourceNames();
 
     public SWBDataStore getDataStore(String name);
@@ -66,6 +68,10 @@ public interface SWBScriptEngine
     public Bindings getUserBindings();
     
     public DataObject getUser();
+    
+    public Object getContextData(String key);
+    
+    public Object setContextData(String key, Object data); 
     
     public SWBScriptUtils getUtils();
     

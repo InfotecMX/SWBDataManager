@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
@@ -206,5 +207,78 @@ public class DataUtils {
         }
         return ret;
     }        
+    
+    public static class TEXT
+    {    
+        /**
+         * Finds the substrings delimited by two given strings, inside another
+         * string.
+         * <p>
+         * Encuentra las subcadenas delimitadas por dos objetos string dados,
+         * dentro de otro objeto string.</p>
+         *
+         * @param str a string into which the substrings are going to be looked
+         * for
+         * @param pre a string that precedes the substring to extract from
+         * {@code str}
+         * @param pos pos a string that goes immediatly after the substring to
+         * extract from {@code str}
+         * @return an iterator with all the substrings found.
+         *
+         */
+        public static Iterator<String> findInterStr(String str, String pre, String pos)
+        {
+            ArrayList<String> ret = new ArrayList();
+            int y = 0;
+            do
+            {
+                y = findInterStr(str, pre, pos, y, ret);
+            }
+            while (y > -1);
+            return ret.iterator();
+        }    
+        
+        /**
+         * Finds a substring in {@code str} which position must be after
+         * {@code index} and is delimited by {@code pre} and {@code pos}
+         * strings. The substring found is then stored in {@code arr}.
+         * <p>
+         * Encuentra una subcadena en {@code str} cuya posici&oacute;n debe ser
+         * posterior a {@code index} y es delimitada por las cadenas {@code pre}
+         * y {@code pos}. La subcadena encontrada se almacena en
+         * {@code arr}.</p>
+         *
+         * @param str a string from which a substring is going to be extracted
+         * @param pre a string that precedes the substring to extract from
+         * {@code str}
+         * @param pos a string that goes immediatly after the substring to
+         * extract from {@code str}
+         * @param index the position in {@code str} from which {@code pre} is
+         * looked for
+         * @param arr the object in which the substring extracted is going to be
+         * stored
+         * @return the index in {@code str} immediatly after {@code pos}, or -1
+         * if {@code pre} is not found in {@code str}. El &iacute;ndice en
+         * {@code str} inmediatamente despu&eacute;s de {@code pos}, o -1 si
+         * {@code pre} no es encontrado en {@code str}.</p>
+         */
+        private static int findInterStr(String str, String pre, String pos,
+                int index, ArrayList arr)
+        {
+
+            int i = str.indexOf(pre, index);
+            if (i > -1)
+            {
+                i = i + pre.length();
+                int j = str.indexOf(pos, i);
+                if (j > -1)
+                {
+                    arr.add(str.substring(i, j));
+                    return j + pos.length();
+                }
+            }
+            return -1;
+        }        
+    }
 
 }

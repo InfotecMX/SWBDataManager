@@ -24,6 +24,18 @@ public class SWBUserScriptEngine implements SWBScriptEngine
 {
     SWBBaseScriptEngine engine=null;
     DataObject user=null;
+    javax.servlet.http.HttpSession session=null;
+    
+    
+    public SWBUserScriptEngine(SWBBaseScriptEngine engine, javax.servlet.http.HttpSession session)
+    {
+        this.engine=engine;
+        this.session=session;
+        if(session!=null)
+        {
+            user = (DataObject) session.getAttribute("_USER_");
+        }        
+    }
     
     public SWBUserScriptEngine(SWBBaseScriptEngine engine, DataObject user)
     {
@@ -62,10 +74,21 @@ public class SWBUserScriptEngine implements SWBScriptEngine
         ScriptObject so=engine.getDataSourceScript(name);
         if(so!=null)
         {
-            return new SWBDataSource(name,so,this);
+            return new SWBDataSource(name,null,so,this);
         }
         return null;
     }
+    
+    @Override
+    public SWBDataSource getDataSource(String name, String modelid)
+    {
+        ScriptObject so=engine.getDataSourceScript(name);
+        if(so!=null)
+        {
+            return new SWBDataSource(name,modelid,so,this);
+        }
+        return null;
+    }    
 
     @Override
     public SWBDataStore getDataStore(String name) {
@@ -135,4 +158,23 @@ public class SWBUserScriptEngine implements SWBScriptEngine
     public Set<String> getDataSourceNames() {
         return engine.getDataSourceNames();
     }
+    
+    public Object getContextData(String key)
+    {
+        if(session!=null)
+        {
+            return session.getAttribute("ctx_"+key);
+        }return null;
+    }
+    
+    public Object setContextData(String key, Object data)
+    {
+        Object ret=null;
+        if(session!=null)
+        {
+            ret=session.getAttribute("ctx_"+key);
+            session.setAttribute("ctx_"+key,data);
+        }
+        return ret;
+    }     
 }

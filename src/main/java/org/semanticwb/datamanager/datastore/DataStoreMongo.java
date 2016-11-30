@@ -81,9 +81,8 @@ public class DataStoreMongo implements SWBDataStore
 //        MongoClient mongoClient = new MongoClient("localhost");
         try
         {
-            ScriptObject dss=dataSource.getDataSourceScript();        
-            String modelid=dss.getString("modelid");
-            String scls=dss.getString("scls");
+            String modelid=dataSource.getModelId();
+            String scls=dataSource.getClassName();
             DB db = mongoClient.getDB(modelid);
             DBCollection coll = db.getCollection(scls);
 
@@ -196,9 +195,8 @@ public class DataStoreMongo implements SWBDataStore
 //        MongoClient mongoClient = new MongoClient("localhost");
         try
         {
-            ScriptObject dss=dataSource.getDataSourceScript();        
-            String modelid=dss.getString("modelid");
-            String scls=dss.getString("scls");
+            String modelid=dataSource.getModelId();
+            String scls=dataSource.getClassName();
             DB db = mongoClient.getDB(modelid);
             DBCollection coll = db.getCollection(scls);
 
@@ -259,10 +257,9 @@ public class DataStoreMongo implements SWBDataStore
 //        MongoClient mongoClient = new MongoClient("localhost");
         try
         {        
-            ScriptObject dss=dataSource.getDataSourceScript();        
             initDB();
-            String modelid=dss.getString("modelid");
-            String scls=dss.getString("scls");
+            String modelid=dataSource.getModelId();
+            String scls=dataSource.getClassName();
             DB db = mongoClient.getDB(modelid);
             DBCollection coll = db.getCollection(scls);
 
@@ -295,10 +292,9 @@ public class DataStoreMongo implements SWBDataStore
 //        MongoClient mongoClient = new MongoClient("localhost");
         try
         {
-            ScriptObject dss=dataSource.getDataSourceScript();        
             initDB();
-            String modelid=dss.getString("modelid");
-            String scls=dss.getString("scls");
+            String modelid=dataSource.getModelId();
+            String scls=dataSource.getClassName();
             DB db = mongoClient.getDB(modelid);
             DBCollection coll = db.getCollection(scls);
 
@@ -336,10 +332,9 @@ public class DataStoreMongo implements SWBDataStore
 //        MongoClient mongoClient = new MongoClient("localhost");
         try
         {        
-            ScriptObject dss=dataSource.getDataSourceScript();        
             initDB();
-            String modelid=dss.getString("modelid");
-            String scls=dss.getString("scls");
+            String modelid=dataSource.getModelId();
+            String scls=dataSource.getClassName();
             DB db = mongoClient.getDB(modelid);
             DBCollection coll = db.getCollection(scls);
 

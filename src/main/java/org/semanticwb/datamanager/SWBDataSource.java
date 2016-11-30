@@ -26,22 +26,25 @@ public class SWBDataSource
     public static final String ACTION_LOGIN="login";
     public static final String ACTION_LOGOUT="logout";
     public static final String ACTION_USER="user";
+    public static final String ACTION_CONTEXTDATA="contextData";
     
     private String name=null;
     private String dataStoreName=null;
     private SWBScriptEngine engine=null;
     private ScriptObject script=null;
     private SWBDataStore db=null;
+    private String modelid=null;
     
     private HashMap<String,DataObject> cache=new HashMap();    
     private HashMap<String,String> removeDependenceFields=null;
     
 
-    protected SWBDataSource(String name, ScriptObject script, SWBScriptEngine engine)
+    protected SWBDataSource(String name, String modelid, ScriptObject script, SWBScriptEngine engine)
     {
         this.name=name;
         this.engine=engine;
-        this.script=script;        
+        this.script=script;      
+        this.modelid=modelid;
         dataStoreName=this.script.getString("dataStore");
         this.db=engine.getDataStore(dataStoreName);        
         if(this.db==null)throw new NoSuchFieldError("DataStore not found:"+dataStoreName);
@@ -433,9 +436,8 @@ public class SWBDataSource
     
     public DataObject validate(DataObject json) throws IOException
     {
-//        ScriptObject dss=getDataSourceScript();        
-//        String modelid=dss.getString("modelid");
-//        String scls=dss.getString("scls");
+//        String modelid=dataSource.getModelId();
+//        String scls=dataSource.getClassName();
         DataObject ret=new DataObject();
         DataObject resp=new DataObject();
         DataObject errors=new DataObject();
@@ -538,10 +540,35 @@ public class SWBDataSource
         return ret;
     }
     
+    public String getModelId()
+    {
+        if(modelid!=null)return modelid;
+        String modelid=getDataSourceScript().getString("modelid");
+        //System.out.println("getModelId 1:"+modelid);
+        
+        Iterator it=DataUtils.TEXT.findInterStr(modelid, "{contextData.", "}");
+        while(it.hasNext())
+        {
+            String s=(String)it.next();
+            String o=(String)engine.getContextData(s);
+            if(o!=null)
+            {
+                modelid=modelid.replace("{contextData."+s+"}", o);
+            }
+        }
+        //System.out.println("getModelId 2:"+modelid);        
+        return modelid;
+    }
+    
+    public String getClassName()
+    {
+        return getDataSourceScript().getString("scls");
+    }    
+    
     public String getBaseUri()
     {
-        String modelid=getDataSourceScript().getString("modelid");
-        String scls=getDataSourceScript().getString("scls");
+        String modelid=getModelId();
+        String scls=getClassName();
         //TODO:get NS
         return "_suri:"+modelid+":"+scls+":";
         //return "_suri:http://swb.org/"+dataStoreName+"/"+modelid+"/"+scls+":";

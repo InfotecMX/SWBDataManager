@@ -44,22 +44,12 @@ public class DataMgr
     
     public static SWBScriptEngine initPlatform(javax.servlet.http.HttpSession session)
     {
-        DataObject user=null;
-        if(session!=null)
-        {
-            user = (DataObject) session.getAttribute("_USER_");
-        }
-        return DataMgr.getUserScriptEngine("[GLOBAL]", user, false);          
+        return DataMgr.getUserScriptEngine("[GLOBAL]", session, false);          
     }    
     
     public static SWBScriptEngine initPlatform(String path, javax.servlet.http.HttpSession session)
     {
-        DataObject user=null;
-        if(session!=null)
-        {
-            user = (DataObject) session.getAttribute("_USER_");
-        }
-        return DataMgr.getUserScriptEngine(path, user, false);          
+        return DataMgr.getUserScriptEngine(path, session, false);          
     }
     
     public void setBaseDatasourse(String baseDatasource)
@@ -188,6 +178,22 @@ public class DataMgr
         SWBBaseScriptEngine engine=SWBBaseScriptEngine.getScriptEngine(source,internal);
         if(engine!=null)return new SWBUserScriptEngine(engine,user);
         return null;
-    }         
+    }  
+    
+    /**
+     * Regresa ScriptEngine asociado al archivo js de datasources 
+     * @param source ruta del archivo js de datasources
+     * @param user datos del usuario
+     * @param internal si es true la ruta es relativa al classpath, de lo contrario es relativa al workpath
+     * @return SWBScriptEngine
+     */
+    public static SWBScriptEngine getUserScriptEngine(String source, javax.servlet.http.HttpSession session, boolean internal)
+    {
+        SWBBaseScriptEngine engine=SWBBaseScriptEngine.getScriptEngine(source,internal);
+        if(engine!=null)return new SWBUserScriptEngine(engine,session);
+        return null;
+    }      
+    
+    
     
 }

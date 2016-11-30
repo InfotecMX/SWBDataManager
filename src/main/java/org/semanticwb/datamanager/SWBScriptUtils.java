@@ -3,31 +3,53 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.semanticwb.datamanager;
 
+import java.io.IOException;
 import java.security.MessageDigest;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import javax.activation.DataHandler;
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.MessagingException;
 import org.semanticwb.datamanager.script.ScriptObject;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 /**
  *
  * @author javiersolis
  */
-public class SWBScriptUtils 
-{
+public class SWBScriptUtils {
+
     SWBScriptEngine engine;
 
-    public SWBScriptUtils(SWBScriptEngine engine) 
-    {
-        this.engine=engine;
+    private static final ExecutorService proccessor = Executors.newSingleThreadExecutor();
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                proccessor.shutdown();
+                proccessor.awaitTermination(1, TimeUnit.MINUTES);
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            }
+        }));
     }
-    
-    public String encodeSHA(String str) 
-    {
-        try
-        {
-            if(str!=null && !str.startsWith("[SHA-512]"))
-            {
+
+    public SWBScriptUtils(SWBScriptEngine engine) {
+        this.engine = engine;
+    }
+
+    public String encodeSHA(String str) {
+        try {
+            if (str != null && !str.startsWith("[SHA-512]")) {
                 MessageDigest md = MessageDigest.getInstance("SHA-512");
                 md.update(str.getBytes());
 
@@ -41,151 +63,111 @@ public class SWBScriptUtils
                 }
                 return sb.toString();
             }
-        }catch(Exception e)
-        {
-            e.printStackTrace();
-        }        
-        return str;
-    }     
-    
-    public boolean sendMail(String to, String subject, String msg)
-    {
-        try
-        {
-            ScriptObject config = engine.getScriptObject().get("config");
-            if (config != null) {
-                ScriptObject smail=config.get("mail");  
-                if(smail==null)return false;
-                String from=smail.getString("from");
-                String fromName=smail.getString("fromName");
-                String host=smail.getString("host");
-                String user=smail.getString("user");
-                String passwd=smail.getString("passwd");
-                int port=(Integer)smail.get("port").getValue();
-                //int sslPort=0;
-                //if(smail.get("sslPort")!=null)
-                //{
-                //    sslPort=(Integer)smail.get("sslPort").getValue();
-                //}
-                boolean ssl=(Boolean)smail.get("ssl").getValue();
-
-                try {
-                    Class MultiPartEmail = Class.forName("org.apache.commons.mail.MultiPartEmail");
-                    Object mail = MultiPartEmail.getConstructor().newInstance();
-
-                    Class DefaultAuthenticator = Class.forName("org.apache.commons.mail.DefaultAuthenticator");
-                    Object auth=DefaultAuthenticator.getConstructor(String.class,String.class).newInstance(user,passwd);
-
-                    MultiPartEmail.getMethod("setAuthenticator", Class.forName("javax.mail.Authenticator")).invoke(mail, auth);            
-                    MultiPartEmail.getMethod("setSmtpPort", Integer.TYPE).invoke(mail, port);
-                    //if(sslPort>0)MultiPartEmail.getMethod("setSslSmtpPort", Integer.TYPE).invoke(mail, sslPort);
-                    
-                    MultiPartEmail.getMethod("setSSLOnConnect", Boolean.TYPE).invoke(mail, ssl);
-                    MultiPartEmail.getMethod("setHostName", String.class).invoke(mail, host);
-                    MultiPartEmail.getMethod("addTo", String.class).invoke(mail, to);
-                    MultiPartEmail.getMethod("setFrom", String.class,String.class).invoke(mail, from, fromName);
-                    MultiPartEmail.getMethod("setSubject", String.class).invoke(mail, subject);
-                    MultiPartEmail.getMethod("setMsg", String.class).invoke(mail, msg);
-                    MultiPartEmail.getMethod("send").invoke(mail);   
-                    
-                    return true;
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-/*                
-                // Create the email message
-                MultiPartEmail mail = new MultiPartEmail();
-                mail.setSmtpPort(port);
-                mail.setAuthenticator(new DefaultAuthenticator(user, passwd));
-                //mail.setTLS(true);
-                mail.setSSL(ssl);
-                mail.setHostName(host);
-                mail.addTo(to);
-                mail.setFrom(from,fromName);
-                mail.setSubject(subject);
-                mail.setMsg(msg);
-                // add the attachment
-                //if(attachment!=null)mail.attach(attachment);
-                // send the email
-                mail.send();   
-                return true;   
-*/        
-            }
-        }catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
-    }      
-  
-     public boolean sendHtmlMail(String to, String subject, String msg)
-    {
-        try
-        {
-            ScriptObject config = engine.getScriptObject().get("config");
-            if (config != null) {
-                ScriptObject smail=config.get("mail");  
-                if(smail==null)return false;
-                String from=smail.getString("from");
-                String fromName=smail.getString("fromName");
-                String host=smail.getString("host");
-                String user=smail.getString("user");
-                String passwd=smail.getString("passwd");
-                int port=(Integer)smail.get("port").getValue();
-                //int sslPort=0;
-                //if(smail.get("sslPort")!=null)
-                //{
-                //    sslPort=(Integer)smail.get("sslPort").getValue();
-                //}
-                boolean ssl=(Boolean)smail.get("ssl").getValue();
+        return str;
+    }
+
+    private Session getSession() {
+        Properties props = new Properties();
+        ScriptObject config = engine.getScriptObject().get("config");
+        if (config != null) {
+            ScriptObject smail = config.get("mail");
+            if (smail != null) {
+                String from = smail.getString("from");
+                String fromName = smail.getString("fromName");
+                String host = smail.getString("host");
+                String user = smail.getString("user");
+                String passwd = smail.getString("passwd");
+                int port = (Integer) smail.get("port").getValue();
+                String transport = smail.getString("transport");
+                String ssltrust = smail.getString("ssltrust");
+                String starttls = smail.getString("starttls");
+
+                if (ssltrust == null) {
+                    ssltrust = "*";
+                }
+                if (starttls == null) {
+                    starttls = "true";
+                }
+
+                props.put("mail.smtp.host", host);
+                props.put("mail.smtp.port", port);
+                props.put("mail.smtps.ssl.trust", ssltrust);
+                props.put("mail.smtp.starttls.enable", starttls);
+            }
+        }
+        return Session.getInstance(props);
+    }
+
+    public boolean sendMail(String to, String subject, String msg) {
+        return sendMail(to, null,subject, msg, "text/plain", null);
+    }
+    
+    public boolean sendHtmlMail(String to, String subject, String msg) {
+        return sendMail(to, null,subject, "<html><body>" + msg + "</body></html>", "text/html", null);    
+    }    
+    
+    public boolean sendMail(String to, String toName, String subject, String message, String contentType, Consumer callback) {
+        Properties props = new Properties();
+        ScriptObject config = engine.getScriptObject().get("config");
+        if (config != null) {
+            ScriptObject smail = config.get("mail");
+            if (smail != null) {
+                String from = smail.getString("from");
+                String fromName = smail.getString("fromName");
+                String host = smail.getString("host");
+                String user = smail.getString("user");
+                String passwd = smail.getString("passwd");
+                int port = (Integer) smail.get("port").getValue();
+                String transport = smail.getString("transport")==null?"smtps":smail.getString("transport");
+                String ssltrust = smail.getString("ssltrust");
+                String starttls = smail.getString("starttls");
+
+                if (ssltrust == null) {
+                    ssltrust = "*";
+                }
+                if (starttls == null) {
+                    starttls = "true";
+                }
+
+                props.put("mail.smtp.host", host);
+                props.put("mail.smtp.port", port);
+                props.put("mail.smtps.ssl.trust", ssltrust);
+                props.put("mail.smtp.starttls.enable", starttls);
 
                 try {
-                    Class HtmlMail = Class.forName("org.apache.commons.mail.HtmlEmail");
-                    Object mail = HtmlMail.getConstructor().newInstance();
+                    Session session = Session.getInstance(props);
+                    InternetAddress userAddr = toName==null?new InternetAddress(to):new InternetAddress(to,toName);
 
-                    Class DefaultAuthenticator = Class.forName("org.apache.commons.mail.DefaultAuthenticator");
-                    Object auth=DefaultAuthenticator.getConstructor(String.class,String.class).newInstance(user,passwd);
-
-                    HtmlMail.getMethod("setAuthenticator", Class.forName("javax.mail.Authenticator")).invoke(mail, auth);            
-                    HtmlMail.getMethod("setSmtpPort", Integer.TYPE).invoke(mail, port);
-                    //if(sslPort>0)MultiPartEmail.getMethod("setSslSmtpPort", Integer.TYPE).invoke(mail, sslPort);
-                    
-                    HtmlMail.getMethod("setSSLOnConnect", Boolean.TYPE).invoke(mail, ssl);
-                    HtmlMail.getMethod("setHostName", String.class).invoke(mail, host);
-                    HtmlMail.getMethod("addTo", String.class).invoke(mail, to);
-                    HtmlMail.getMethod("setFrom", String.class,String.class).invoke(mail, from, fromName);
-                    HtmlMail.getMethod("setSubject", String.class).invoke(mail, subject);
-                    HtmlMail.getMethod("setHtmlMsg", String.class).invoke(mail, "<html><body>"+msg+"</body></html>");
-                    HtmlMail.getMethod("setMsg", String.class).invoke(mail, msg);
-                    HtmlMail.getMethod("send").invoke(mail);   
-                    
+                    Message msg = new MimeMessage(session);
+                    Address[] addrs = new Address[]{new InternetAddress(from, fromName)};
+                    msg.addFrom(addrs);
+                    msg.setRecipient(Message.RecipientType.TO, userAddr);
+                    msg.setSubject(subject);
+                    msg.setDataHandler(new DataHandler(message, contentType));
+                    proccessor.submit(() -> 
+                    {
+                        try {
+                            Transport t = session.getTransport(transport);
+                            t.connect(host, port, user, passwd);
+                            t.sendMessage(msg, (new Address[]{userAddr}));
+                            t.close();
+                            if(callback!=null)callback.accept(null);
+                        } catch (MessagingException uex) {
+                            uex.printStackTrace();
+                        }
+                    });
                     return true;
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                } catch (IOException | MessagingException uex) {
+                    uex.printStackTrace();
                 }
-/*                
-                // Create the email message
-                MultiPartEmail mail = new MultiPartEmail();
-                mail.setSmtpPort(port);
-                mail.setAuthenticator(new DefaultAuthenticator(user, passwd));
-                //mail.setTLS(true);
-                mail.setSSL(ssl);
-                mail.setHostName(host);
-                mail.addTo(to);
-                mail.setFrom(from,fromName);
-                mail.setSubject(subject);
-                mail.setMsg(msg);
-                // add the attachment
-                //if(attachment!=null)mail.attach(attachment);
-                // send the email
-                mail.send();   
-                return true;   
-*/        
             }
-        }catch(Exception e)
-        {
-            e.printStackTrace();
         }
         return false;
     }
+
+
+
 }
